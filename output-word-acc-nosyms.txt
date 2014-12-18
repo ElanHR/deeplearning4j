@@ -1,0 +1,44 @@
+make: Nothing to be done for `all'.
+capital-common-countries:
+ACCURACY TOP1: 78.85 %  (399 / 506)
+Total accuracy: 78.85 %   Semantic accuracy: 78.85 %   Syntactic accuracy: -nan % 
+capital-world:
+ACCURACY TOP1: 61.64 %  (895 / 1452)
+Total accuracy: 66.09 %   Semantic accuracy: 66.09 %   Syntactic accuracy: -nan % 
+currency:
+ACCURACY TOP1: 23.88 %  (64 / 268)
+Total accuracy: 61.01 %   Semantic accuracy: 61.01 %   Syntactic accuracy: -nan % 
+city-in-state:
+ACCURACY TOP1: 47.87 %  (752 / 1571)
+Total accuracy: 55.57 %   Semantic accuracy: 55.57 %   Syntactic accuracy: -nan % 
+family:
+ACCURACY TOP1: 77.45 %  (237 / 306)
+Total accuracy: 57.20 %   Semantic accuracy: 57.20 %   Syntactic accuracy: -nan % 
+gram1-adjective-to-adverb:
+ACCURACY TOP1: 18.78 %  (142 / 756)
+Total accuracy: 51.22 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 18.78 % 
+gram2-opposite:
+ACCURACY TOP1: 23.53 %  (72 / 306)
+Total accuracy: 49.58 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 20.15 % 
+gram3-comparative:
+ACCURACY TOP1: 66.67 %  (840 / 1260)
+Total accuracy: 52.93 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 45.39 % 
+gram4-superlative:
+ACCURACY TOP1: 43.28 %  (219 / 506)
+Total accuracy: 52.23 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 45.01 % 
+gram5-present-participle:
+ACCURACY TOP1: 40.42 %  (401 / 992)
+Total accuracy: 50.75 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 43.82 % 
+gram6-nationality-adjective:
+ACCURACY TOP1: 87.82 %  (1204 / 1371)
+Total accuracy: 56.22 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 55.44 % 
+gram7-past-tense:
+ACCURACY TOP1: 40.99 %  (546 / 1332)
+Total accuracy: 54.31 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 52.49 % 
+gram8-plural:
+ACCURACY TOP1: 68.95 %  (684 / 992)
+Total accuracy: 55.56 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 54.66 % 
+gram9-plural-verbs:
+ACCURACY TOP1: 36.31 %  (236 / 650)
+Total accuracy: 54.54 %   Semantic accuracy: 57.20 %   Syntactic accuracy: 53.20 % 
+Questions seen / total: 12268 19544   62.77 % 
