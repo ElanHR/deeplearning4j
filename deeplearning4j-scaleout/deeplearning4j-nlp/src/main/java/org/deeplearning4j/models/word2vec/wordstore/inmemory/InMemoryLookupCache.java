@@ -1,7 +1,10 @@
 package org.deeplearning4j.models.word2vec.wordstore.inmemory;
 
 import com.google.common.util.concurrent.AtomicDouble;
+
+import edu.smu.tspell.wordnet.WordNetDatabase;
 import it.unimi.dsi.util.XorShift64StarRandomGenerator;
+
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.FastMath;
@@ -18,6 +21,8 @@ import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.buffer.FloatBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+
+
 
 
 import java.io.*;
@@ -37,6 +42,10 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
     private Counter<String> wordFrequencies = Util.parallelCounter();
     private Counter<String> docFrequencies = Util.parallelCounter();
     private Map<String,VocabWord> vocabs = new ConcurrentHashMap<>();
+    
+    //transient WordNetDatabase wnDB;// = WordNetDatabase.getFileInstance();
+    //private Map<String,Collection<String>> synsets = new ConcurrentHashMap<>();
+    
     private Map<String,VocabWord> tokens = new ConcurrentHashMap<>();
     private Map<Integer,INDArray> codes = new ConcurrentHashMap<>();
     private INDArray syn0,syn1;
@@ -64,7 +73,7 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
         this.negative = negative;
         initExpTable();
 
-
+        //this.wnDB = WordNetDatabase.getFileInstance();
 
     }
 
@@ -344,6 +353,15 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
     public  synchronized Collection<String> words() {
         return vocabs.keySet();
     }
+    
+    /**
+     * Returns all of the synsets for a word in the vocab
+     * @returns all of the synsets for a word in the vocab
+     */
+    public Collection<String> synsets(){
+    	return null;
+    }
+    
 
     /**
      * Reset the weights of the cache
@@ -543,7 +561,7 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
             throw new IllegalStateException("Unable to add token " + word + " when not already a token");
         vocabs.put(word,token);
         wordIndex.add(word,token.getIndex());
-
+        
     }
 
     /**
@@ -697,12 +715,13 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
         InMemoryLookupCache cache = SerializationUtils.readObject(new File("ser"));
         this.codes = cache.codes;
         this.vocabs = cache.vocabs;
+        //this.synsets = cache.synsets;
         this.vectorLength = cache.vectorLength;
         this.wordFrequencies = cache.wordFrequencies;
         this.wordIndex = cache.wordIndex;
         this.tokens = cache.tokens;
 
-
+        //this.wnDB = WordNetDatabase.getFileInstance();
     }
 
 

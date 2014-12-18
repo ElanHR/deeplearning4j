@@ -74,6 +74,12 @@ public interface VocabCache  {
     Collection<String> words();
 
     /**
+     * Returns all of the synsets for a word in the vocab
+     * @returns all of the synsets for a word in the vocab
+     */
+    Collection<String> synsets();
+    
+    /**
      * Reset the weights of the cache
      */
     void resetWeights();

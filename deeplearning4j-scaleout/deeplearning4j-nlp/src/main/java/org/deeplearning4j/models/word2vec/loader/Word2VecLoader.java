@@ -70,7 +70,7 @@ public class Word2VecLoader {
 
                     data[i] = vectors;
                  
-            }
+         
 
                     cache.addWordToIndex(cache.numWords(),word);
                     cache.addToken(new VocabWord(1,word));
