@@ -1,9 +1,19 @@
 package org.deeplearning4j.models.word2vec.wordstore.inmemory;
 
-import com.google.common.util.concurrent.AtomicDouble;
-
-import edu.smu.tspell.wordnet.WordNetDatabase;
 import it.unimi.dsi.util.XorShift64StarRandomGenerator;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -22,13 +32,15 @@ import org.nd4j.linalg.api.buffer.FloatBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import com.google.common.util.concurrent.AtomicDouble;
 
-
-
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import edu.mit.jwi.Dictionary;
+import edu.mit.jwi.IDictionary;
+import edu.mit.jwi.item.IIndexWord;
+import edu.mit.jwi.item.ISynset;
+import edu.mit.jwi.item.IWord;
+import edu.mit.jwi.item.IWordID;
+import edu.mit.jwi.item.POS;
 
 /**
  * In memory lookup cache for smaller datasets
@@ -43,8 +55,8 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
     private Counter<String> docFrequencies = Util.parallelCounter();
     private Map<String,VocabWord> vocabs = new ConcurrentHashMap<>();
     
-    //transient WordNetDatabase wnDB;// = WordNetDatabase.getFileInstance();
-    //private Map<String,Collection<String>> synsets = new ConcurrentHashMap<>();
+    transient private IDictionary dict;
+    private Map<String,Collection<String>> synsets = new ConcurrentHashMap<>();
     
     private Map<String,VocabWord> tokens = new ConcurrentHashMap<>();
     private Map<Integer,INDArray> codes = new ConcurrentHashMap<>();
@@ -73,8 +85,12 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
         this.negative = negative;
         initExpTable();
 
-        //this.wnDB = WordNetDatabase.getFileInstance();
-
+        URL url = null;
+        try{ 
+        	url = new URL("file", null, System.getenv("wordnet.database.dir")); } 
+	    catch(MalformedURLException e){ e.printStackTrace(); }
+	    if(url != null) 
+	    	 dict = new Dictionary(url);
     }
 
 
@@ -355,11 +371,11 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
     }
     
     /**
-     * Returns all of the synsets for a word in the vocab
-     * @returns all of the synsets for a word in the vocab
+     * Returns all of the synsets for a word
+     * @returns all the synsets for a word
      */
-    public Collection<String> synsets(){
-    	return null;
+    public Collection<String> synsets(String word){
+    	return synsets.get(word);
     }
     
 
@@ -549,6 +565,60 @@ public class InMemoryLookupCache implements VocabCache,Serializable {
         wordIndex.add(word,index);
 
     }
+    
+    public void findAllSynsets(){
+    	//log.info("grabbingSynsets ");
+    	
+    	try {
+			dict.open();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	for(String v: vocabs.keySet()){
+    		synsets.put(v, getSynsetsForWord(v));
+    	}
+    	
+    	dict.close();
+    }
+    private Collection<String> getSynsetsForWord(String wordToLookup){
+    	Collection<String> wordForms = new ArrayList<String>();
+    	
+
+//    	Synset[] s4w = wnDB.getSynsets(word);
+//    	
+//    	for(Synset s: s4w){
+//    		String[] wfs = s.getWordForms();
+//    		for(String wf: wfs){
+//    			//if(!wf.equalsIgnoreCase(word) && !wordForms.contains(wf) && vocabs.containsKey(wf.toLowerCase()))
+//    			//if(!wf.equalsIgnoreCase(word) && !wordForms.contains(wf))
+//                	//log.info("adding "+ wf);
+//
+//    				wordForms.add(wf);
+//    		}
+//    	}
+    	
+    	for(POS r: POS.values()){
+		    IIndexWord idxWord = dict.getIndexWord(wordToLookup, r);
+		    if(idxWord != null){
+			    for(IWordID wordID:idxWord.getWordIDs()){
+				    //IWordID wordID = idxWord . getWordIDs ().get (0) ; // 1st meaning
+				    IWord word = dict . getWord ( wordID );
+				    ISynset synset = word . getSynset ();
+		
+				    for( IWord w : synset . getWords ()){
+				    	if(!w.getLemma().equalsIgnoreCase(wordToLookup) && !wordForms.contains(w.getLemma()) && vocabs.containsKey(w.getLemma().toLowerCase()))
+				    		wordForms.add(w.getLemma());
+				    }
+				    	
+				     //System .out . println (w. getLemma ());
+			    }
+		    }
+	    }
+    	
+    	return wordForms;
+    }
+    
 
     /**
      * @param word

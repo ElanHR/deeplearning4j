@@ -72,12 +72,14 @@ public interface VocabCache  {
      * @returns all the words in the vocab
      */
     Collection<String> words();
+    
+    void findAllSynsets();
 
     /**
-     * Returns all of the synsets for a word in the vocab
-     * @returns all of the synsets for a word in the vocab
+     * Returns all of the synsets for a word
+     * @returns all the synsets for a word
      */
-    Collection<String> synsets();
+    Collection<String> synsets(String word);
     
     /**
      * Reset the weights of the cache

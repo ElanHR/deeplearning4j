@@ -78,6 +78,9 @@ public class Word2Vec implements Persistable {
     protected int workers = Runtime.getRuntime().availableProcessors();
     protected Queue<List<List<VocabWord>>> jobQueue = new LinkedBlockingDeque<>(10000);
 
+    // how much we care about wordnet
+    private double wordnet_weight = .2;
+    
     public Word2Vec() {}
 
 
@@ -638,6 +641,9 @@ public class Word2Vec implements Persistable {
         log.info("Resetting weights");
         if(shouldReset)
             resetWeights();
+        
+        log.info("Grabbing Synsets");
+        cache.findAllSynsets();
 
     }
 
@@ -652,6 +658,7 @@ public class Word2Vec implements Persistable {
             log.info("Loading vocab...");
             cache.loadVocab();
             cache.resetWeights();
+            cache.findAllSynsets();
             return true;
         }
 
@@ -724,6 +731,16 @@ public class Word2Vec implements Persistable {
     public void  iterate(VocabWord w1, VocabWord w2,AtomicLong nextRandom,double alpha) {
         cache.iterateSample(w1,w2,nextRandom,alpha);
 
+        
+        Collection<String> syns = cache.synsets(w1.getWord());
+        
+        for(String s: syns){
+            cache.iterateSample(
+            		w1,
+            		cache.wordFor(s),
+            		nextRandom,
+            		wordnet_weight/syns.size() );
+        }
     }
 
 
@@ -893,6 +910,8 @@ public class Word2Vec implements Persistable {
         protected double sampling = 1e-5;
         protected int workers = Runtime.getRuntime().availableProcessors();
 
+        private double wn_w = 0.2;
+
 
         public Builder workers(int workers) {
             this.workers = workers;
@@ -1000,7 +1019,10 @@ public class Word2Vec implements Persistable {
             return this;
         }
 
-
+        public Builder setWordNetWeight(double w) {
+            this.wn_w = w;
+            return this;
+        }
 
 
         public Word2Vec build() {
@@ -1022,6 +1044,7 @@ public class Word2Vec implements Persistable {
                 ret.minLearningRate = minLearningRate;
                 ret.sample = sampling;
                 ret.workers = workers;
+                ret.wordnet_weight = wn_w;
 
                 try {
                     if (tokenizerFactory == null)
